@@ -28,6 +28,14 @@ from .propagation import Propagator
 from .reflection import Reflector
 from .signal_processing import SignalProcessor
 
+# Alert system import (optional)
+try:
+    from ..alerts import AlertManager
+    ALERTS_AVAILABLE = True
+except ImportError:
+    ALERTS_AVAILABLE = False
+    AlertManager = None
+
 
 class TradingAgentsGraph:
     """Main class that orchestrates the trading agents framework."""
@@ -100,6 +108,15 @@ class TradingAgentsGraph:
         self.propagator = Propagator()
         self.reflector = Reflector(self.quick_thinking_llm)
         self.signal_processor = SignalProcessor(self.quick_thinking_llm)
+
+        # Initialize alert system if available and configured
+        self.alert_manager = None
+        if ALERTS_AVAILABLE and AlertManager and self.config.get("alert_config"):
+            try:
+                self.alert_manager = AlertManager(self.config["alert_config"])
+                print("✅ Alert system initialized")
+            except Exception as e:
+                print(f"⚠️ Failed to initialize alert system: {e}")
 
         # State tracking
         self.curr_state = None
@@ -186,8 +203,27 @@ class TradingAgentsGraph:
         # Log state
         self._log_state(trade_date, final_state)
 
+        # Process signal to get clean decision
+        processed_decision = self.process_signal(final_state["final_trade_decision"])
+
+        # Send alert if alert system is configured
+        if self.alert_manager:
+            try:
+                summary = self._create_alert_summary(final_state)
+                alert_results = self.alert_manager.send_trade_alert(
+                    ticker=company_name,
+                    decision=processed_decision,
+                    trade_date=trade_date,
+                    full_analysis=final_state,
+                    summary=summary
+                )
+                if alert_results:
+                    print(f"📱 Alerts sent: {list(alert_results.keys())}")
+            except Exception as e:
+                print(f"⚠️ Failed to send alerts: {e}")
+
         # Return decision and processed signal
-        return final_state, self.process_signal(final_state["final_trade_decision"])
+        return final_state, processed_decision
 
     def _log_state(self, trade_date, final_state):
         """Log the final state to a JSON file."""
@@ -252,3 +288,51 @@ class TradingAgentsGraph:
     def process_signal(self, full_signal):
         """Process a signal to extract the core decision."""
         return self.signal_processor.process_signal(full_signal)
+
+    def _create_alert_summary(self, final_state) -> str:
+        """Create a concise summary for alerts."""
+        ticker = final_state.get("company_of_interest", "Unknown")
+        decision = self.process_signal(final_state.get("final_trade_decision", ""))
+        
+        # Extract key insights from reports
+        market_insights = "Market analysis complete"
+        if final_state.get("market_report"):
+            # Try to extract a key sentence or two
+            market_report = final_state["market_report"]
+            if len(market_report) > 200:
+                market_insights = market_report[:200] + "..."
+            else:
+                market_insights = market_report
+        
+        summary = f"Trading decision for {ticker}: {decision}. {market_insights}"
+        return summary
+
+    def test_alerts(self):
+        """Test the alert system."""
+        if not self.alert_manager:
+            print("❌ Alert system not configured")
+            return False
+        
+        print("🧪 Testing alert system...")
+        results = self.alert_manager.test_alerts()
+        
+        if results:
+            print("✅ Alert test results:")
+            for handler, success in results.items():
+                status = "✅ Success" if success else "❌ Failed"
+                print(f"  {handler}: {status}")
+        else:
+            print("❌ No alert handlers configured")
+        
+        return any(results.values()) if results else False
+
+    def get_alert_status(self):
+        """Get status of alert system."""
+        if not self.alert_manager:
+            return {"available": False, "reason": "Alert system not configured"}
+        
+        return {
+            "available": True,
+            "enabled": self.alert_manager.is_enabled(),
+            "handlers": self.alert_manager.get_handler_status()
+        }

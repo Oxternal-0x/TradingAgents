@@ -1,0 +1,13 @@
+# Optional dependencies for Trading Agents Alert System
+
+# Desktop notifications
+plyer>=2.0
+
+# SMS notifications via Twilio  
+twilio>=8.0.0
+
+# Task scheduling for continuous monitoring
+schedule>=1.2.0
+
+# Already included in main requirements.txt:
+# requests - for HTTP webhooks and Slack notifications
