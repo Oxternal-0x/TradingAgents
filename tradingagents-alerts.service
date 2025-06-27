@@ -1,0 +1,16 @@
+[Unit]
+Description=TradingAgents Trade Alert Monitor
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/workspace
+Environment=PATH=/home/ubuntu/.nvm/versions/node/v22.16.0/bin:/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/ubuntu/.cursor-server/extensions/ms-python.debugpy-2025.6.0/bundled/scripts/noConfigScripts
+EnvironmentFile=/workspace/alert_config.env
+ExecStart=/usr/bin/python3 /workspace/trade_alert_monitor.py --schedule daily --tickers SPY QQQ AAPL
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
