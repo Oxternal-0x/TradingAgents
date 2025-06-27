@@ -3,9 +3,22 @@ import requests
 import logging
 from datetime import datetime
 from typing import Dict, Any, Optional
-from email.mime.text import MimeText
-from email.mime.multipart import MimeMultipart
 from abc import ABC, abstractmethod
+
+# Safe imports for email functionality
+try:
+    from email.mime.text import MIMEText as MimeText
+    from email.mime.multipart import MIMEMultipart as MimeMultipart
+    EMAIL_AVAILABLE = True
+except ImportError:
+    try:
+        from email.MIMEText import MIMEText as MimeText
+        from email.MIMEMultipart import MIMEMultipart as MimeMultipart
+        EMAIL_AVAILABLE = True
+    except ImportError:
+        EMAIL_AVAILABLE = False
+        MimeText = None
+        MimeMultipart = None
 
 try:
     import plyer
@@ -49,7 +62,10 @@ class EmailNotificationHandler(NotificationHandler):
     
     def is_configured(self) -> bool:
         return bool(
-            self.sender_email 
+            EMAIL_AVAILABLE
+            and MimeText is not None
+            and MimeMultipart is not None
+            and self.sender_email 
             and self.sender_password 
             and self.recipient_emails
         )
@@ -62,6 +78,10 @@ class EmailNotificationHandler(NotificationHandler):
         
         try:
             # Create message
+            if MimeMultipart is None or MimeText is None:
+                logging.error("Email MIME modules not available")
+                return False
+                
             msg = MimeMultipart()
             msg['From'] = self.sender_email
             msg['To'] = ', '.join(self.recipient_emails)

@@ -21,15 +21,15 @@ class AlertManager:
         self.enabled = config.get("alerts_enabled", True)
         self.alert_on_decisions = config.get("alert_on_decisions", ["BUY", "SELL"])
         
-        # Initialize handlers based on configuration
-        self._initialize_handlers()
-        
-        # Set up logging
+        # Set up logging first
         logging.basicConfig(
             level=logging.INFO,
             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         )
         self.logger = logging.getLogger(__name__)
+        
+        # Initialize handlers based on configuration
+        self._initialize_handlers()
     
     def _initialize_handlers(self):
         """Initialize notification handlers based on configuration."""
