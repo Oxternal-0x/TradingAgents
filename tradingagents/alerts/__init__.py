@@ -6,6 +6,7 @@ from .notification_handlers import (
     DesktopNotificationHandler,
     WebhookNotificationHandler,
 )
+from .telegram_handler import TelegramNotificationHandler
 
 __all__ = [
     "AlertManager",
@@ -14,4 +15,5 @@ __all__ = [
     "SlackNotificationHandler",
     "DesktopNotificationHandler",
     "WebhookNotificationHandler",
+    "TelegramNotificationHandler",
 ]

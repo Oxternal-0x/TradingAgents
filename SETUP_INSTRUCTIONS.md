@@ -14,7 +14,7 @@ Your trading alert system has been successfully created and configured with:
 
 ## 🚀 Quick Start (Choose One)
 
-### Option 1: Gmail Email Alerts (Recommended)
+### Option 1: Gmail Email Alerts (Most Reliable)
 ```bash
 # Run the Gmail setup helper
 python3 setup_gmail_alerts.py
@@ -25,7 +25,21 @@ This will guide you through:
 3. Sending a test alert
 4. Creating working configuration
 
-### Option 2: Webhook Alerts Only
+### Option 2: Telegram Mobile Alerts (Fastest)
+```bash
+# Preview what you'll get
+python3 test_telegram_simple.py
+
+# Full interactive setup
+python3 telegram_setup_guide.py
+```
+This will guide you through:
+1. Creating a Telegram bot
+2. Getting your chat ID
+3. Sending instant test alerts
+4. Setting up mobile notifications
+
+### Option 3: Webhook Alerts Only
 ```bash
 # Get a webhook URL from webhook.site
 # Update alert_config.py with your webhook URL
@@ -33,7 +47,15 @@ This will guide you through:
 python3 test_personal_alerts.py
 ```
 
-### Option 3: Console Alerts (Immediate Testing)
+### Option 4: Multi-Channel Setup (Best)
+```bash
+# Set up both email AND Telegram
+python3 setup_gmail_alerts.py
+python3 telegram_setup_guide.py
+# Use FULL_ALERT_SYSTEM configuration
+```
+
+### Option 5: Console Alerts (Immediate Testing)
 ```bash
 # Test the basic system without external dependencies
 python3 test_trading_with_alerts.py
@@ -57,7 +79,27 @@ python3 setup_gmail_alerts.py
 ```
 Enter your 16-character app password when prompted.
 
-## 🔗 Webhook Setup (Optional)
+## � Telegram Setup (Recommended)
+
+### Step 1: Create Telegram Bot
+1. Open Telegram and search for '@BotFather'
+2. Send: `/newbot`
+3. Name your bot (e.g., "MyTradingBot")
+4. Choose username ending in 'bot' (e.g., "mytradingalerts_bot")
+5. Save the bot token
+
+### Step 2: Interactive Setup
+```bash
+python3 telegram_setup_guide.py
+```
+Follow the prompts to get your chat ID and test the bot.
+
+### Step 3: Test Telegram Alerts
+```bash
+python3 test_telegram_alerts.py
+```
+
+## �🔗 Webhook Setup (Optional)
 
 ### Step 1: Get Webhook URL
 1. Visit [webhook.site](https://webhook.site)
@@ -94,13 +136,25 @@ Your base configuration with email and API key settings.
 ### `working_alert_config.py` (Generated)
 Created by `setup_gmail_alerts.py` with your working Gmail credentials.
 
+### `telegram_config.py` (Generated)
+Created by `telegram_setup_guide.py` with your bot credentials.
+
 ### `DESKTOP_WEBHOOK_CONFIG`
 Ready-to-use configuration for desktop + webhook alerts.
+
+### `FULL_ALERT_SYSTEM`
+Multi-channel configuration supporting email, Telegram, and webhooks.
 
 ## 🧪 Test Scripts
 
 ### `setup_gmail_alerts.py`
 Interactive setup for Gmail alerts with testing.
+
+### `telegram_setup_guide.py`
+Interactive setup for Telegram alerts with bot creation and testing.
+
+### `test_telegram_simple.py`
+Preview Telegram setup and message formatting.
 
 ### `test_personal_alerts.py`
 Test your alert configuration without trading analysis.
@@ -116,6 +170,15 @@ Rich HTML emails with:
 - 📊 Analysis summary
 - 📈 Key metrics and targets
 - 🎯 Confidence levels
+
+### Telegram Alerts (NEW!)
+Instant mobile notifications with:
+- 🟢📈 Formatted messages with emojis
+- 📊 Ticker, date, and summary
+- 🎯 Price targets and stop losses
+- 📊 Confidence percentages
+- 🔧 Technical analysis snippets
+- ⚡ Instant delivery to your phone
 
 ### Webhook Alerts
 JSON payload to your webhook URL with:

@@ -4,6 +4,7 @@ Alert Configuration Template
 Copy this template to create your alert configuration.
 Update the settings with your actual credentials and preferences.
 """
+from typing import Optional
 
 ALERT_CONFIG_TEMPLATE = {
     # Global alert settings
@@ -60,6 +61,15 @@ ALERT_CONFIG_TEMPLATE = {
                 "Authorization": "Bearer your-token"
             },
             "webhook_timeout": 10
+        },
+        
+        # Telegram notifications (instant mobile alerts)
+        "telegram": {
+            "enabled": False,  # Set to True to enable
+            "bot_token": "your-bot-token-here",     # Get from @BotFather on Telegram
+            "chat_id": "your-chat-id-here",         # Your personal chat ID
+            "parse_mode": "Markdown",               # Format messages with Markdown
+            "disable_notification": False,         # Set to True for silent notifications
         }
     }
 }
@@ -109,8 +119,25 @@ def create_slack_config(webhook_url: str, channel: str = "#trading-alerts"):
         }
     }
 
+# Configuration for Telegram alerts
+def create_telegram_config(bot_token: str, chat_id: str, disable_notification: bool = False):
+    """Create Telegram-only alert configuration."""
+    return {
+        "alerts_enabled": True,
+        "alert_on_decisions": ["BUY", "SELL"],
+        "notification_handlers": {
+            "telegram": {
+                "enabled": True,
+                "bot_token": bot_token,
+                "chat_id": chat_id,
+                "parse_mode": "Markdown",
+                "disable_notification": disable_notification
+            }
+        }
+    }
+
 # Multi-channel configuration
-def create_multi_channel_config(email_config: dict = None, slack_config: dict = None, sms_config: dict = None):
+def create_multi_channel_config(email_config: Optional[dict] = None, slack_config: Optional[dict] = None, sms_config: Optional[dict] = None, telegram_config: Optional[dict] = None):
     """Create multi-channel alert configuration."""
     config = {
         "alerts_enabled": True,
@@ -136,6 +163,12 @@ def create_multi_channel_config(email_config: dict = None, slack_config: dict = 
         config["notification_handlers"]["sms"] = {
             "enabled": True,
             **sms_config
+        }
+    
+    if telegram_config is not None:
+        config["notification_handlers"]["telegram"] = {
+            "enabled": True,
+            **telegram_config
         }
     
     return config

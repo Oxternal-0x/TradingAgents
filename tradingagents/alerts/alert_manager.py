@@ -9,6 +9,7 @@ from .notification_handlers import (
     DesktopNotificationHandler,
     WebhookNotificationHandler,
 )
+from .telegram_handler import TelegramNotificationHandler
 
 
 class AlertManager:
@@ -79,6 +80,15 @@ class AlertManager:
                 self.logger.info("Webhook notification handler initialized")
             else:
                 self.logger.warning("Webhook handler configured but missing URL")
+        
+        # Telegram handler
+        if "telegram" in handler_configs and handler_configs["telegram"].get("enabled", False):
+            telegram_handler = TelegramNotificationHandler(handler_configs["telegram"])
+            if telegram_handler.is_configured():
+                self.handlers.append(telegram_handler)
+                self.logger.info("Telegram notification handler initialized")
+            else:
+                self.logger.warning("Telegram handler configured but missing bot token or chat ID")
         
         if not self.handlers:
             self.logger.warning("No notification handlers configured or available")
